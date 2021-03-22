@@ -3,14 +3,14 @@ const fs = require("fs");
 
 const SOUBOR_ZADATELE = "registrace.json";
 
-let zpravy = new Array();
+let zadatele = new Array();
 if (fs.existsSync(SOUBOR_ZADATELE)) {
-  zpravy = JSON.parse(fs.readFileSync(SOUBOR_ZADATELE));
+  zadatele = JSON.parse(fs.readFileSync(SOUBOR_ZADATELE));
 }
 
 function seznamZadatelu(pozadavek, odpoved) {
   odpoved.writeHead(200, {"Content-type": "application/json"});
-  odpoved.end(JSON.stringify(zpravy));
+  odpoved.end(JSON.stringify(zadatele));
 }
 
 function pridaniZadatele(pozadavek, odpoved) {
@@ -24,9 +24,13 @@ function pridaniZadatele(pozadavek, odpoved) {
     console.log(parametry);
     let obj = {};
     obj.id = uniqid();
-    obj.zprava = parametry.zprava;
-    zpravy.push(obj);
-    fs.writeFileSync(SOUBOR_ZADATELE, JSON.stringify(zpravy, null, 4));
+    obj.jmeno = parametry.jmeno;
+    obj.prijmeni = parametry.prijmeni;
+    obj.rodne_c = parametry.rodne_c;
+    obj.ctyrcisli = parametry.ctyrcisli;
+    obj.o_misto= parametry.o_misto;
+    zadatele.push(obj);
+    fs.writeFileSync(SOUBOR_ZADATELE, JSON.stringify(zadatele, null, 4));
 
     odpoved.writeHead(200, {"Content-type": "application/json",
             "Access-Control-Allow-Origin": "*"});
@@ -43,17 +47,17 @@ function detailZadatele(pozadavek, odpoved) {
   pozadavek.on('end', function () {
     let parametry = JSON.parse(data);
     console.log(parametry);
-    let zprava = {status:"Chyba",chyba:"Nenalezeno"};
-    for (let i = 0; i < zpravy.length; i++) {
-      if (zpravy[i].id == parametry.id) {
-        zprava = zpravy[i];
+    let zadatel = {status:"Chyba",chyba:"Nenalezeno"};
+    for (let i = 0; i < zadatele.length; i++) {
+      if (zadatele[i].id == parametry.id) {
+        zadatel = zadatele[i];
         break;
       }
     }
 
     odpoved.writeHead(200, {"Content-type": "application/json",
             "Access-Control-Allow-Origin": "*"});
-    odpoved.end(JSON.stringify(zprava));
+    odpoved.end(JSON.stringify(zadatel));
   })
 }
 
@@ -66,11 +70,15 @@ function aktualizaceZadatele(pozadavek, odpoved) {
   pozadavek.on('end', function () {
     let parametry = JSON.parse(data);
     console.log(parametry);
-    for (let i = 0; i < zpravy.length; i++) {
-      if (zpravy[i].id == parametry.id) {
-        zpravy[i].zprava = parametry.zprava;
-        zpravy[i].upraveno = true;
-        fs.writeFileSync(SOUBOR_ZADATELE, JSON.stringify(zpravy, null, 4));
+    for (let i = 0; i < zadatele.length; i++) {
+      if (zadatele[i].id == parametry.id) {
+        zadatele[i].jmeno = parametry.jmeno;
+        zadatele[i].prijmeni = parametry.prijmeni;
+        zadatele[i].rodne_c = parametry.rodne_c;
+        zadatele[i].ctyrcisli = parametry.ctyrcisli;
+        zadatele[i].o_misto = parametry.o_misto;
+        zadatele[i].upraveno = true;
+        fs.writeFileSync(SOUBOR_ZADATELE, JSON.stringify(zadatele, null, 4));
         break;
       }
     }
@@ -90,10 +98,10 @@ function odstraneniZadatele(pozadavek, odpoved) {
   pozadavek.on('end', function () {
     let parametry = JSON.parse(data);
     console.log(parametry);
-    for (let i = 0; i < zpravy.length; i++) {
-      if (zpravy[i].id == parametry.id) {
-        zpravy.splice(i, 1);
-        fs.writeFileSync(SOUBOR_ZADATELE, JSON.stringify(zpravy, null, 4));
+    for (let i = 0; i < zadatele.length; i++) {
+      if (zadatele[i].id == parametry.id) {
+        zadatele.splice(i, 1);
+        fs.writeFileSync(SOUBOR_ZADATELE, JSON.stringify(zadatele, null, 4));
         break;
       }
     }
@@ -104,16 +112,16 @@ function odstraneniZadatele(pozadavek, odpoved) {
   })
 }
 
-exports.zpracovaniChatu = function(pozadavek, odpoved) {
-  if (pozadavek.url.startsWith("/chat/seznamZadatelu")) {
+exports.zpracovaniRegistrace = function(pozadavek, odpoved) {
+  if (pozadavek.url.startsWith("/registrace/seznamZadatelu")) {
     seznamZadatelu(pozadavek, odpoved);
-  } else if (pozadavek.url.startsWith("/chat/pridaniZadatele")) {
+  } else if (pozadavek.url.startsWith("/registrace/pridaniZadatele")) {
     pridaniZadatele(pozadavek, odpoved);
-  } else if (pozadavek.url.startsWith("/chat/detailZadatele")) {
+  } else if (pozadavek.url.startsWith("/registrace/detailZadatele")) {
     detailZadatele(pozadavek, odpoved);
-  } else if (pozadavek.url.startsWith("/chat/aktualizaceZadatele")) {
+  } else if (pozadavek.url.startsWith("/registrace/aktualizaceZadatele")) {
     aktualizaceZadatele(pozadavek, odpoved);
-  } else if (pozadavek.url.startsWith("/chat/odstraneniZadatele")) {
+  } else if (pozadavek.url.startsWith("/registrace/odstraneniZadatele")) {
     odstraneniZadatele(pozadavek, odpoved);
   } else {
     odpoved.writeHead(404);

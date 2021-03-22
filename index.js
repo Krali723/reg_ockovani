@@ -23,7 +23,7 @@ function zpracovaniPozadavku(pozadavek, odpoved) {
     console.log("pripona:"+pripona);
     odpoved.writeHead(200, {"Content-type": "image/"+pripona});
     odpoved.end(fs.readFileSync("./obrazky/"+nazevSouboru));
-  } else if (pozadavek.url.startsWith("/chat/")) {
+  } else if (pozadavek.url.startsWith("/registrace/")) {
     zpracovaniRegistrace(pozadavek, odpoved);
   } else {
     odpoved.writeHead(404);
